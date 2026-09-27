@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Chivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-mono: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+@layer base {
+  body {
+    font-family: 'Chivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'kern' 1, 'liga' 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.005em;
+  }
+
+  code, kbd, samp, pre {
+    font-family: 'Chivo Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.018em;
+  }
+}
+
+/* Distinctive Metrological & Architectural Typography */
+.font-display {
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.font-light-display {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* Custom Light Royal Blue Gradient Utilities */
+.bg-royal-gradient {
+  background: linear-gradient(135deg, #0284c7 0%, #2563eb 50%, #1d4ed8 100%);
+}
+
+.bg-royal-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f0f7ff 100%);
+}
+
+.bg-royal-glow {
+  background: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.18) 0%, transparent 70%);
+}
+
+.border-royal-gradient {
+  border-image: linear-gradient(to bottom right, #38bdf8, #2563eb, #0284c7) 1;
+}
+
+/* Reference Button Styling: Crisp Solid White Button & Glass Light-Blue Button */
+.btn-ref-primary {
+  background-color: #ffffff;
+  color: #0b2554;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(11, 37, 84, 0.15);
+}
+
+.btn-ref-primary:hover {
+  background-color: #f0f7ff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(11, 37, 84, 0.22);
+}
+
+.btn-ref-secondary {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+}
+
+.btn-ref-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.28);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+/* Subtle sleek scrollbar for sidebar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+/* Real-time Viewfinder Scanning Line Animations */
+@keyframes scanline-vertical {
+  0% {
+    top: 2%;
+    opacity: 0.75;
+  }
+  50% {
+    top: calc(98% - 2px);
+    opacity: 1;
+  }
+  100% {
+    top: 2%;
+    opacity: 0.75;
+  }
+}
+
+@keyframes scanline-trail-down {
+  0% {
+    top: -24px;
+    opacity: 0.2;
+  }
+  50% {
+    top: calc(98% - 36px);
+    opacity: 0.45;
+  }
+  100% {
+    top: -24px;
+    opacity: 0.2;
+  }
+}
+
+@keyframes scan-stream-sweep {
+  0% {
+    top: 0%;
+    opacity: 0.15;
+  }
+  50% {
+    top: calc(100% - 2px);
+    opacity: 0.4;
+  }
+  100% {
+    top: 0%;
+    opacity: 0.15;
+  }
+}
+
+.animate-scanline-vertical {
+  animation: scanline-vertical 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-scanline-trail {
+  animation: scanline-trail-down 2.4s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.animate-scan-stream-sweep {
+  animation: scan-stream-sweep 3.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
