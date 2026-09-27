@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { SessionAttachment, User } from '../types';
+import { downloadDataUrlFile, downloadBlob } from '../lib/downloadHelper';
 import { 
   Camera, 
   FileText, 
@@ -377,15 +378,30 @@ export const SessionAttachments: React.FC<SessionAttachmentsProps> = ({
 
                   <div className="flex items-center space-x-1">
                     <button
+                      onClick={() => {
+                        if (att.dataUrl) {
+                          downloadDataUrlFile(att.dataUrl, att.name);
+                        } else {
+                          const text = `WeighSure Evidence Attachment\nName: ${att.name}\nCategory: ${att.category}\nUploaded By: ${att.uploadedBy}\nUploaded At: ${att.uploadedAt}\nNotes: ${att.notes || 'None'}`;
+                          const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                          downloadBlob(blob, `${att.name}.txt`);
+                        }
+                      }}
+                      className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors cursor-pointer"
+                      title="Download Evidence File to Computer"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                    </button>
+                    <button
                       onClick={() => setPreviewModalAttachment(att)}
-                      className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition-colors"
+                      className="p-1.5 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded transition-colors cursor-pointer"
                       title="View Details"
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => onDeleteAttachment(att.id)}
-                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors"
+                      className="p-1.5 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded transition-colors cursor-pointer"
                       title="Remove Attachment"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -457,12 +473,31 @@ export const SessionAttachments: React.FC<SessionAttachmentsProps> = ({
                 <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                 <span>Archived in Legal Verification Repository</span>
               </div>
-              <button
-                onClick={() => setPreviewModalAttachment(null)}
-                className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-xs hover:bg-slate-800"
-              >
-                Close Preview
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (previewModalAttachment.dataUrl) {
+                      downloadDataUrlFile(previewModalAttachment.dataUrl, previewModalAttachment.name);
+                    } else {
+                      const text = `WeighSure Evidence Attachment\nName: ${previewModalAttachment.name}\nCategory: ${previewModalAttachment.category}\nUploaded By: ${previewModalAttachment.uploadedBy}\nUploaded At: ${previewModalAttachment.uploadedAt}\nNotes: ${previewModalAttachment.notes || 'None'}`;
+                      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                      downloadBlob(blob, `${previewModalAttachment.name}.txt`);
+                    }
+                  }}
+                  className="px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs inline-flex items-center space-x-1.5 cursor-pointer"
+                  title="Save original evidence file to your system"
+                >
+                  <Download className="w-3.5 h-3.5 text-slate-600" />
+                  <span>Download File</span>
+                </button>
+                <button
+                  onClick={() => setPreviewModalAttachment(null)}
+                  className="px-4 py-2 bg-slate-900 text-white text-xs font-bold rounded-lg shadow-xs hover:bg-slate-800 cursor-pointer"
+                >
+                  Close Preview
+                </button>
+              </div>
             </div>
           </div>
         </div>

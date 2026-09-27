@@ -32,8 +32,11 @@ import {
   AlertTriangle,
   Camera,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Download,
+  Table
 } from 'lucide-react';
+import { downloadCsv } from '../lib/downloadHelper';
 import { SessionAttachments } from './SessionAttachments';
 
 interface TestSessionDetailProps {
@@ -231,6 +234,34 @@ export const TestSessionDetail: React.FC<TestSessionDetailProps> = ({
   };
 
   const nextAction = getSingleNextAction();
+
+  const handleExportObservationsCsv = () => {
+    const headers = [
+      'Index',
+      'Test Type',
+      'Load Value',
+      'Unit',
+      'Observed Reading',
+      'Direction',
+      'Position',
+      'Source',
+      'Confirmed',
+      'Created At'
+    ];
+    const rows = session.observations.map(o => [
+      o.testPointIndex,
+      o.testType,
+      o.loadValue,
+      instrument?.unit || 'g',
+      o.observedReading,
+      o.direction || 'N/A',
+      o.position || 'N/A',
+      o.source,
+      o.confirmedByTechnician ? 'Yes' : 'No',
+      o.createdAt
+    ]);
+    downloadCsv(`WeighSure-Observations-${session.id}.csv`, headers, rows);
+  };
 
   const handleAddObservation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -606,20 +637,30 @@ export const TestSessionDetail: React.FC<TestSessionDetailProps> = ({
               </button>
               <button
                 onClick={() => setIsAddingObservation(true)}
-                className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow-xs transition-colors"
+                className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow-xs transition-colors cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Add Observation</span>
               </button>
               {session.observations.length > 0 && (
-                <button
-                  onClick={handleRunCalculation}
-                  disabled={isProcessing}
-                  className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-xs transition-colors"
-                >
-                  <Scale className="w-3.5 h-3.5" />
-                  <span>Execute OIML Calculation →</span>
-                </button>
+                <>
+                  <button
+                    onClick={handleExportObservationsCsv}
+                    className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition-colors cursor-pointer"
+                    title="Download CSV spreadsheet of observations to your system"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-500" />
+                    <span>CSV</span>
+                  </button>
+                  <button
+                    onClick={handleRunCalculation}
+                    disabled={isProcessing}
+                    className="inline-flex items-center space-x-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Scale className="w-3.5 h-3.5" />
+                    <span>Execute OIML Calculation →</span>
+                  </button>
+                </>
               )}
             </div>
           )}

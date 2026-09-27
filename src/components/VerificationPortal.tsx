@@ -17,8 +17,11 @@ import {
   Scan,
   RefreshCw,
   FileCheck2,
-  Check
+  Check,
+  Download,
+  Printer
 } from 'lucide-react';
+import { downloadJson } from '../lib/downloadHelper';
 import { QrCameraScanner } from './QrCameraScanner';
 
 interface VerificationPortalProps {
@@ -432,6 +435,28 @@ export const VerificationPortal: React.FC<VerificationPortalProps> = ({
                       {result.verification.signatureHash}
                     </div>
                   </div>
+                </div>
+
+                {/* Direct Download & Hardcopy Verification Actions */}
+                <div className="pt-3 border-t border-slate-200 flex items-center justify-end space-x-2">
+                  <button
+                    onClick={() => {
+                      downloadJson(result, `WeighSure-Verification-Proof-${result.certificateNumber || result.reportNumber || code}.json`);
+                    }}
+                    className="px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs inline-flex items-center space-x-1.5 cursor-pointer"
+                    title="Download JSON proof to your system"
+                  >
+                    <Download className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Download Verification Proof</span>
+                  </button>
+                  <button
+                    onClick={() => window.print()}
+                    className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow-xs inline-flex items-center space-x-1.5 cursor-pointer"
+                    title="Print official legal metrology verification proof"
+                  >
+                    <Printer className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Print Proof</span>
+                  </button>
                 </div>
               </div>
             </div>

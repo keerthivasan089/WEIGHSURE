@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AuditLog, User } from '../types';
+import { downloadJson, downloadCsv } from '../lib/downloadHelper';
 import { 
   History, 
   Search, 
@@ -9,7 +10,8 @@ import {
   Calendar, 
   User as UserIcon,
   Code,
-  Download
+  Download,
+  Table
 } from 'lucide-react';
 
 interface AuditTrailProps {
@@ -37,13 +39,22 @@ export const AuditTrail: React.FC<AuditTrailProps> = ({ auditLogs, currentUser }
   });
 
   const handleExportAuditJson = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredLogs, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `WeighSure-Audit-Ledger-${new Date().toISOString().split('T')[0]}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
+    downloadJson(filteredLogs, `WeighSure-Audit-Ledger-${new Date().toISOString().split('T')[0]}.json`);
+  };
+
+  const handleExportAuditCsv = () => {
+    const headers = ['Timestamp', 'Action', 'Officer / User', 'Role', 'Entity Type', 'Entity ID', 'Rule Version ID', 'Metadata'];
+    const rows = filteredLogs.map(log => [
+      log.timestamp,
+      log.action,
+      log.userName,
+      log.userRole,
+      log.entityType,
+      log.entityId,
+      log.ruleVersionId || 'N/A',
+      JSON.stringify(log.metadataJson || {})
+    ]);
+    downloadCsv(`WeighSure-Audit-Ledger-${new Date().toISOString().split('T')[0]}.csv`, headers, rows);
   };
 
   return (
@@ -65,13 +76,24 @@ export const AuditTrail: React.FC<AuditTrailProps> = ({ auditLogs, currentUser }
           </p>
         </div>
 
-        <button
-          onClick={handleExportAuditJson}
-          className="inline-flex items-center space-x-2 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition-colors"
-        >
-          <Download className="w-3.5 h-3.5 text-slate-500" />
-          <span>Export Audit Manifest</span>
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={handleExportAuditCsv}
+            className="inline-flex items-center space-x-2 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition-colors cursor-pointer"
+            title="Download CSV spreadsheet of audit records to your system"
+          >
+            <Table className="w-3.5 h-3.5 text-emerald-600" />
+            <span>CSV (Excel)</span>
+          </button>
+          <button
+            onClick={handleExportAuditJson}
+            className="inline-flex items-center space-x-2 px-3 py-1.5 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 shadow-2xs transition-colors cursor-pointer"
+            title="Download complete JSON audit ledger to your system"
+          >
+            <Download className="w-3.5 h-3.5 text-slate-500" />
+            <span>JSON Ledger</span>
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search */}
