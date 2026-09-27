@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { VerificationLookupResult } from '../types';
+import { VerificationLookupResult, TestSession, Instrument } from '../types';
+import { verifyCodeLocally } from '../lib/standaloneStore';
 import { 
   ShieldCheck, 
   Search, 
@@ -23,11 +24,15 @@ import { QrCameraScanner } from './QrCameraScanner';
 interface VerificationPortalProps {
   initialCode?: string;
   onClose: () => void;
+  sessions?: TestSession[];
+  instruments?: Instrument[];
 }
 
 export const VerificationPortal: React.FC<VerificationPortalProps> = ({
   initialCode = '',
-  onClose
+  onClose,
+  sessions = [],
+  instruments = []
 }) => {
   const [code, setCode] = useState(initialCode);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,13 +48,26 @@ export const VerificationPortal: React.FC<VerificationPortalProps> = ({
     setError(null);
     try {
       const res = await fetch(`/api/verify/${encodeURIComponent(codeToVerify.trim())}`);
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.message || 'Certificate or instrument record not found');
+      if (res.ok) {
+        const data = await res.json();
+        setResult(data);
+        return;
       }
-      setResult(data);
+    } catch {
+      // Backend unavailable or static host
+    }
+
+    // Universal local lookup fallback
+    try {
+      const fallbackResult = verifyCodeLocally(codeToVerify, sessions, instruments);
+      if (fallbackResult && fallbackResult.isValid) {
+        setResult(fallbackResult);
+      } else {
+        setError(`Certificate or record '${codeToVerify}' was not found in registered database.`);
+        setResult(null);
+      }
     } catch (err: any) {
-      setError(err.message || 'Certificate not found or invalid');
+      setError(err.message || 'Verification search failed');
       setResult(null);
     } finally {
       setIsLoading(false);

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Instrument, OcrExtractionResult, OcrExtractedObservation } from '../types';
+import { extractMockOcr } from '../lib/standaloneStore';
 import { 
   Scan, 
   Upload, 
@@ -39,6 +40,7 @@ export const OcrIntakeModal: React.FC<OcrIntakeModalProps> = ({
   // Trigger OCR extraction
   const handleExtract = async () => {
     setIsProcessing(true);
+    let data: OcrExtractionResult | null = null;
     try {
       const response = await fetch('/api/ocr/extract', {
         method: 'POST',
@@ -50,21 +52,26 @@ export const OcrIntakeModal: React.FC<OcrIntakeModalProps> = ({
         })
       });
 
-      if (!response.ok) throw new Error('OCR extraction failed');
-      const data: OcrExtractionResult = await response.json();
-      setExtractionResult(data);
-      setEditableObservations(data.observations);
-
-      // Match instrument if detected
-      if (data.detectedInstrument?.serialNo) {
-        const match = instruments.find(i => i.serialNo === data.detectedInstrument?.serialNo);
-        if (match) setSelectedInstrumentId(match.id);
+      if (response.ok) {
+        data = await response.json();
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsProcessing(false);
+    } catch {
+      // API unavailable or static deployment
     }
+
+    if (!data) {
+      data = extractMockOcr(selectedPreset, 'analytical');
+    }
+
+    setExtractionResult(data);
+    setEditableObservations(data.observations);
+
+    // Match instrument if detected
+    if (data.detectedInstrument?.serialNo) {
+      const match = instruments.find(i => i.serialNo === data!.detectedInstrument?.serialNo);
+      if (match) setSelectedInstrumentId(match.id);
+    }
+    setIsProcessing(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

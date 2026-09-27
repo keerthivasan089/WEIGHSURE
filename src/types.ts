@@ -45,16 +45,16 @@ export interface Instrument {
   model: string;
   serialNo: string;
   accuracyClass: AccuracyClass;
-  instrumentType: InstrumentType;
+  instrumentType?: InstrumentType;
   maxCapacity: number; // in unit (e.g., g, kg)
   minCapacity: number; // in unit
   scaleInterval_d: number; // actual scale interval d
   verificationInterval_e: number; // verification scale interval e
   unit: string; // 'g', 'kg', 'mg'
-  location: string;
+  location?: string;
   customerName: string;
   nextVerificationDue?: string; // ISO date string (YYYY-MM-DD)
-  createdBy: string;
+  createdBy?: string;
   createdAt: string;
 }
 
@@ -156,6 +156,7 @@ export interface TestSession {
   instrument?: Instrument;
   technicianId: string;
   technicianName: string;
+  technicianLicense?: string;
   environmentalConditions: EnvironmentalConditions;
   status: TestSessionStatus;
   ruleVersionId: string;
@@ -186,11 +187,18 @@ export interface ReportRecord {
   id: string;
   testSessionId: string;
   reportNumber: string;
+  certificateNumber?: string;
   qrCodeValue: string; // URL / verification token
   qrVerificationCode?: string; // Human-readable token
+  verificationLookupCode?: string;
   qrCodeDataUrl?: string; // Rendered QR Code PNG
   signatureHash: string;
   generatedAt: string;
+  issuedAt?: string;
+  validUntil?: string;
+  decision?: CalculationDecision;
+  summaryText?: string;
+  tamperEvidentHash?: string;
   verifiedCount?: number;
 }
 
@@ -235,15 +243,17 @@ export interface AuditLog {
 }
 
 export interface OcrExtractedObservation {
-  tempId: string;
+  tempId?: string;
   testType: TestType;
   direction?: 'increasing' | 'decreasing';
   position?: 'center' | 'front-left' | 'front-right' | 'rear-left' | 'rear-right';
   loadValue: number;
   observedReading: number;
   deltaL?: number;
+  turningPoint_L?: number;
+  repetitionIndex?: number;
   confidence: number;
-  isFlaggedAnomaly: boolean;
+  isFlaggedAnomaly?: boolean;
   anomalyNote?: string;
   originalText?: string;
 }
@@ -259,15 +269,23 @@ export interface OcrExtractionResult {
   };
   environmentalConditions?: EnvironmentalConditions;
   observations: OcrExtractedObservation[];
-  averageConfidence: number;
-  flaggedCount: number;
-  extractedAt: string;
+  averageConfidence?: number;
+  flaggedCount?: number;
+  extractedAt?: string;
+  overallConfidence?: number;
+  extractionTimestamp?: string;
 }
 
 export interface VerificationLookupResult {
-  verified: boolean;
-  reportNumber: string;
-  status: 'AUTHENTIC_AND_VALID' | 'REVOKED' | 'EXPIRED' | 'NOT_FOUND';
+  verified?: boolean;
+  isValid?: boolean;
+  reportNumber?: string;
+  certificateNumber?: string;
+  issuedAt?: string;
+  validUntil?: string;
+  decision?: any;
+  summaryText?: string;
+  status: 'AUTHENTIC_AND_VALID' | 'REVOKED' | 'EXPIRED' | 'NOT_FOUND' | 'valid' | 'invalid' | 'pending';
   instrument: {
     manufacturer: string;
     model: string;
@@ -275,9 +293,12 @@ export interface VerificationLookupResult {
     accuracyClass: AccuracyClass;
     instrumentType?: InstrumentType;
     maxCapacity: number;
+    scaleInterval_d?: number;
+    verificationInterval_e?: number;
     unit: string;
+    customerName?: string;
   };
-  verification: {
+  verification?: {
     result: CalculationDecision;
     verifiedAt: string;
     validUntil: string;
@@ -287,8 +308,14 @@ export interface VerificationLookupResult {
     licenseNo: string;
     signatureHash: string;
   };
-  environmentalConditions: EnvironmentalConditions;
-  maxObservedError: number;
-  toleranceThreshold: number;
-  verifiedTimestamp: string;
+  officer?: {
+    name: string;
+    license: string;
+  };
+  tamperEvidentHash?: string;
+  ruleVersionLabel?: string;
+  environmentalConditions?: EnvironmentalConditions;
+  maxObservedError?: number;
+  toleranceThreshold?: number;
+  verifiedTimestamp?: string;
 }
